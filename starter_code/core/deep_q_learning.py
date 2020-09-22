@@ -1,6 +1,7 @@
 import os
 import numpy as np
 import tensorflow as tf
+import tensorflow.compat.v1 as tfv1
 import time
 
 from core.q_learning import QN
@@ -60,7 +61,7 @@ class DQN(QN):
                     of type tf.uint8.
                     if , values are between 0 and 255 -> 0 and 1
         """
-        state = tf.cast(state, tf.float32)
+        state = tfv1.cast(state, tfv1.float32)
         state /= self.config.high
 
         return state
@@ -97,20 +98,20 @@ class DQN(QN):
         Creates a tf Session and run initializer of variables
         """
         # create tf session
-        self.sess = tf.Session()
+        self.sess = tfv1.Session()
 
         # tensorboard stuff
         self.add_summary()
 
         # initiliaze all variables
-        init = tf.global_variables_initializer()
+        init = tfv1.global_variables_initializer()
         self.sess.run(init)
 
         # synchronise q and target_q networks
         self.sess.run(self.update_target_op)
 
         # for saving networks weights
-        self.saver = tf.train.Saver()
+        self.saver = tfv1.train.Saver()
 
        
     def add_summary(self):
@@ -118,34 +119,34 @@ class DQN(QN):
         Tensorboard stuff
         """
         # extra placeholders to log stuff from python
-        self.avg_reward_placeholder = tf.placeholder(tf.float32, shape=(), name="avg_reward")
-        self.max_reward_placeholder = tf.placeholder(tf.float32, shape=(), name="max_reward")
-        self.std_reward_placeholder = tf.placeholder(tf.float32, shape=(), name="std_reward")
+        self.avg_reward_placeholder = tfv1.placeholder(tfv1.float32, shape=(), name="avg_reward")
+        self.max_reward_placeholder = tfv1.placeholder(tfv1.float32, shape=(), name="max_reward")
+        self.std_reward_placeholder = tfv1.placeholder(tfv1.float32, shape=(), name="std_reward")
 
-        self.avg_q_placeholder  = tf.placeholder(tf.float32, shape=(), name="avg_q")
-        self.max_q_placeholder  = tf.placeholder(tf.float32, shape=(), name="max_q")
-        self.std_q_placeholder  = tf.placeholder(tf.float32, shape=(), name="std_q")
+        self.avg_q_placeholder  = tfv1.placeholder(tfv1.float32, shape=(), name="avg_q")
+        self.max_q_placeholder  = tfv1.placeholder(tfv1.float32, shape=(), name="max_q")
+        self.std_q_placeholder  = tfv1.placeholder(tfv1.float32, shape=(), name="std_q")
 
-        self.eval_reward_placeholder = tf.placeholder(tf.float32, shape=(), name="eval_reward")
+        self.eval_reward_placeholder = tfv1.placeholder(tfv1.float32, shape=(), name="eval_reward")
 
         # add placeholders from the graph
-        tf.summary.scalar("loss", self.loss)
-        tf.summary.scalar("grads_norm", self.grad_norm)
+        tfv1.summary.scalar("loss", self.loss)
+        tfv1.summary.scalar("grads_norm", self.grad_norm)
 
         # extra summaries from python -> placeholders
-        tf.summary.scalar("Avg_Reward", self.avg_reward_placeholder)
-        tf.summary.scalar("Max_Reward", self.max_reward_placeholder)
-        tf.summary.scalar("Std_Reward", self.std_reward_placeholder)
+        tfv1.summary.scalar("Avg_Reward", self.avg_reward_placeholder)
+        tfv1.summary.scalar("Max_Reward", self.max_reward_placeholder)
+        tfv1.summary.scalar("Std_Reward", self.std_reward_placeholder)
 
-        tf.summary.scalar("Avg_Q", self.avg_q_placeholder)
-        tf.summary.scalar("Max_Q", self.max_q_placeholder)
-        tf.summary.scalar("Std_Q", self.std_q_placeholder)
+        tfv1.summary.scalar("Avg_Q", self.avg_q_placeholder)
+        tfv1.summary.scalar("Max_Q", self.max_q_placeholder)
+        tfv1.summary.scalar("Std_Q", self.std_q_placeholder)
 
-        tf.summary.scalar("Eval_Reward", self.eval_reward_placeholder)
+        tfv1.summary.scalar("Eval_Reward", self.eval_reward_placeholder)
             
         # logging
-        self.merged = tf.summary.merge_all()
-        self.file_writer = tf.summary.FileWriter(self.config.output_path, 
+        self.merged = tfv1.summary.merge_all()
+        self.file_writer = tfv1.summary.FileWriter(self.config.output_path,
                                                 self.sess.graph)
 
 

@@ -1,5 +1,6 @@
 import tensorflow as tf
-import tensorflow.contrib.layers as layers
+import tensorflow.compat.v1 as tfv1
+tfv1.disable_eager_execution()
 
 from utils.general import get_logger
 from utils.test_env import EnvTest
@@ -52,12 +53,12 @@ class NatureQN(Linear):
             - Make sure to also specify the scope and reuse
 
         """
-        with tf.compat.v1.variable_scope(scope):
-            conv1 = tf.layers.conv2d(state, filters=32, kernel_size=8, strides=4, activation='relu', reuse=reuse, name='conv1')
-            conv2 = tf.layers.conv2d(conv1, filters=64, kernel_size=4, strides=2, activation='relu', reuse=reuse, name='conv2')
-            conv3 = tf.layers.conv2d(conv2, filters=64, kernel_size=3, strides=1, activation='relu', reuse=reuse, name='conv3')
-            dense1 = tf.layers.dense(tf.layers.flatten(conv3), 512, reuse=reuse, name='dense1')
-            out = tf.layers.dense(tf.layers.flatten(dense1), num_actions, reuse=reuse, name='output_layer')
+        with tfv1.variable_scope(scope):
+            conv1 = tfv1.layers.conv2d(state, filters=32, kernel_size=8, strides=4, activation='relu', reuse=reuse, name='conv1')
+            conv2 = tfv1.layers.conv2d(conv1, filters=64, kernel_size=4, strides=2, activation='relu', reuse=reuse, name='conv2')
+            conv3 = tfv1.layers.conv2d(conv2, filters=64, kernel_size=3, strides=1, activation='relu', reuse=reuse, name='conv3')
+            dense1 = tfv1.layers.dense(tfv1.layers.flatten(conv3), 512, reuse=reuse, name='dense1')
+            out = tfv1.layers.dense(tfv1.layers.flatten(dense1), num_actions, reuse=reuse, name='output_layer')
 
         return out
 

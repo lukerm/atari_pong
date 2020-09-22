@@ -1,5 +1,6 @@
 import tensorflow as tf
-import tensorflow.contrib.layers as layers
+import tensorflow.compat.v1 as tfv1
+tfv1.disable_eager_execution()
 
 from utils.general import get_logger
 from utils.test_env import EnvTest
@@ -50,12 +51,12 @@ class Linear(DQN):
             You can also use the state_shape computed above.
         """
         img_height, img_width, n_channels = self.env.observation_space.shape
-        self.s = tf.compat.v1.placeholder("uint8", [None, img_height, img_width, n_channels * config.state_history])
-        self.a = tf.compat.v1.placeholder("int32", None)
-        self.r = tf.compat.v1.placeholder("float32", None)
-        self.sp = tf.compat.v1.placeholder("uint8", [None, img_height, img_width, n_channels * config.state_history])
-        self.done_mask = tf.compat.v1.placeholder("float32", None)
-        self.lr = tf.compat.v1.placeholder("float32", ())
+        self.s = tfv1.placeholder("uint8", [None, img_height, img_width, n_channels * config.state_history])
+        self.a = tfv1.placeholder("int32", None)
+        self.r = tfv1.placeholder("float32", None)
+        self.sp = tfv1.placeholder("uint8", [None, img_height, img_width, n_channels * config.state_history])
+        self.done_mask = tfv1.placeholder("float32", None)
+        self.lr = tfv1.placeholder("float32", ())
 
     def get_q_values_op(self, state, scope, reuse=False):
         """
@@ -87,7 +88,7 @@ class Linear(DQN):
             - Make sure to also specify the scope and reuse
         """
         with tf.compat.v1.variable_scope(scope):
-            out = tf.layers.dense(tf.layers.flatten(state), num_actions, reuse=reuse)
+            out = tfv1.layers.dense(tfv1.layers.flatten(state), num_actions, reuse=reuse)
 
         return out
 
@@ -134,10 +135,10 @@ class Linear(DQN):
         #
         # self.update_target_op = update_target_op
 
-        q_keys = tf.get_collection(tf.GraphKeys.GLOBAL_VARIABLES, scope=q_scope)
-        target_q_keys = tf.get_collection(tf.GraphKeys.GLOBAL_VARIABLES, scope=target_q_scope)
-        ops = [tf.assign(target_q_keys[i], q_keys[i]) for i, _ in enumerate(q_keys)]
-        self.update_target_op = tf.group(*ops)
+        q_keys = tfv1.get_collection(tfv1.GraphKeys.GLOBAL_VARIABLES, scope=q_scope)
+        target_q_keys = tfv1.get_collection(tfv1.GraphKeys.GLOBAL_VARIABLES, scope=target_q_scope)
+        ops = [tfv1.assign(target_q_keys[i], q_keys[i]) for i, _ in enumerate(q_keys)]
+        self.update_target_op = tfv1.group(*ops)
 
     def add_loss_op(self, q, target_q):
         """
@@ -181,7 +182,7 @@ class Linear(DQN):
         indices = tf.one_hot(self.a, num_actions)
         q_sa = tf.reduce_sum(q * indices, axis=1)
 
-        self.loss = tf.reduce_mean(tf.squared_difference(q_samp, q_sa))
+        self.loss = tf.reduce_mean(tfv1.squared_difference(q_samp, q_sa))
 
     def add_optimizer_op(self, scope):
         """
@@ -214,15 +215,15 @@ class Linear(DQN):
              you can access config variables by writing self.config.variable_name
         """
 
-        adam_optimizer = tf.compat.v1.train.AdamOptimizer(learning_rate=self.lr)
-        scope_variable = tf.get_collection(tf.GraphKeys.TRAINABLE_VARIABLES, scope=scope)
+        adam_optimizer = tfv1.train.AdamOptimizer(learning_rate=self.lr)
+        scope_variable = tfv1.get_collection(tfv1.GraphKeys.TRAINABLE_VARIABLES, scope=scope)
         gradients_and_vars = adam_optimizer.compute_gradients(loss=self.loss, var_list=scope_variable)
 
         if self.config.grad_clip:
             gradients_and_vars = [(tf.clip_by_norm(grad, self.config.clip_val), var) for grad, var in gradients_and_vars]
 
         self.train_op = adam_optimizer.apply_gradients(gradients_and_vars)
-        self.grad_norm = tf.global_norm([grad for grad, _ in gradients_and_vars])
+        self.grad_norm = tfv1.global_norm([grad for grad, _ in gradients_and_vars])
 
 
 if __name__ == '__main__':
