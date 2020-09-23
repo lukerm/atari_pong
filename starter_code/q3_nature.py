@@ -57,8 +57,8 @@ class NatureQN(Linear):
             conv1 = tfv1.layers.conv2d(state, filters=32, kernel_size=8, strides=4, activation='relu', reuse=reuse, name='conv1')
             conv2 = tfv1.layers.conv2d(conv1, filters=64, kernel_size=4, strides=2, activation='relu', reuse=reuse, name='conv2')
             conv3 = tfv1.layers.conv2d(conv2, filters=64, kernel_size=3, strides=1, activation='relu', reuse=reuse, name='conv3')
-            dense1 = tfv1.layers.dense(tfv1.layers.flatten(conv3), 512, reuse=reuse, name='dense1')
-            out = tfv1.layers.dense(tfv1.layers.flatten(dense1), num_actions, reuse=reuse, name='output_layer')
+            dense1 = tfv1.layers.dense(tfv1.layers.flatten(conv3), units=512, activation='relu', reuse=reuse, name='dense1')
+            out = tfv1.layers.dense(dense1, units=num_actions, reuse=reuse, name='output_layer')
 
         return out
 
