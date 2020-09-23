@@ -25,7 +25,7 @@ class config():
     soft_epsilon      = 0.05
 
     # nature paper hyper params
-    nsteps_train       = 5000000
+    nsteps_train       = 4000000
     batch_size         = 32
     buffer_size        = 1000000
     target_update_freq = 10000
