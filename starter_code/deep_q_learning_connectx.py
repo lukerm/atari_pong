@@ -22,12 +22,16 @@ class ConnectXEnv(gym.Env):
         self.kaggle_config = self.env.configuration
         self.action_space = gym.spaces.Discrete(self.kaggle_config['columns'])
         self.observation_space = gym.spaces.Box(low=0, high=2, shape=(self.kaggle_config['rows'], self.kaggle_config['columns'], 1), dtype=np.uint8)
+        self.trainer = self.env.train([None, 'negamax'])  # Assumes we go first
 
     def step(self, action):
-        observation, reward, done, info = self.env.step(action)
+        observation, reward, done, info = self.trainer.step(action)
         # Reshape the observation into a 6 x 7 x 1 image
         new_observation = np.array(observation['board']).reshape(self.kaggle_config['rows'], self.kaggle_config['columns'], 1)
-        return new_observation, reward, done, info
+        # Reward is None when trying to place in an already-full column: set to -1000 instead
+        new_reward = reward if reward is not None else -2
+
+        return new_observation, new_reward, done, info
 
     def reset(self):
         observation = self.env.reset()[0]['observation']
