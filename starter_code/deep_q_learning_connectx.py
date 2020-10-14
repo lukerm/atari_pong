@@ -39,7 +39,7 @@ class ConnectXEnv(gym.Env):
         return new_observation
 
     def get_available_actions(self, state: np.ndarray):
-        assert state.shape == (self.kaggle_config['rows'], self.kaggle_config['columns'], 1)
+        assert state.shape == (self.kaggle_config['rows'], self.kaggle_config['columns'], 1) or np.sum(state) == 0, state
         return np.where(state[0, :, 0] == 0)[0]  # Check the top row only for available spaces
 
 
