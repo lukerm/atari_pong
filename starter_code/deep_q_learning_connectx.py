@@ -86,11 +86,13 @@ class ConnectXQN(NatureQN):
         # this information might be useful
         num_actions = self.env.action_space.n
         with tfv1.variable_scope(scope):
-            conv = tfv1.layers.conv2d(state, filters=8, kernel_size=3, strides=1, activation='relu', reuse=reuse, name='conv1')
+            #conv = tfv1.layers.conv2d(state, filters=8, kernel_size=3, strides=1, activation='relu', reuse=reuse, name='conv1')
             #conv2 = tfv1.layers.conv2d(conv1, filters=64, kernel_size=4, strides=2, activation='relu', reuse=reuse, name='conv2')
             #conv3 = tfv1.layers.conv2d(conv2, filters=64, kernel_size=3, strides=1, activation='relu', reuse=reuse, name='conv3')
-            dense1 = tfv1.layers.dense(tfv1.layers.flatten(conv), units=32, activation='relu', reuse=reuse, name='dense1')
-            out = tfv1.layers.dense(dense1, units=num_actions, reuse=reuse, name='output_layer')
+            #dense1 = tfv1.layers.dense(tfv1.layers.flatten(conv), units=32, activation='relu', reuse=reuse, name='dense1')
+            dense1 = tfv1.layers.dense(tfv1.layers.flatten(state), units=32, activation='relu', reuse=reuse, name='dense1')
+            dense2 = tfv1.layers.dense(tfv1.layers.flatten(dense1), units=32, activation='relu', reuse=reuse, name='dense2')
+            out = tfv1.layers.dense(dense2, units=num_actions, reuse=reuse, name='output_layer')
 
         return out
 
